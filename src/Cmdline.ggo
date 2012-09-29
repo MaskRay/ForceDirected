@@ -1,0 +1,4 @@
+option  "algorithm"            a  "algorithm"                         int     default="0"          optional
+option  "width"            w  "width"                         double     default="400"          optional
+option  "height"            h  "height"                         double     default="400"          optional
+
