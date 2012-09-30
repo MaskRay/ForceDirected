@@ -1,73 +1,84 @@
 #ifndef CORE_HH
 #define CORE_HH
 
+#include <array>
 #include <cmath>
+#include <utility>
 #include <vector>
+using std::array;
+using std::pair;
 using std::sqrt;
+using std::vector;
 
-#if defined(USE_FLOAT)
-typedef float ft;
-#else
-typedef double ft;
-#endif
-
-struct Vector
+template<typename T, size_t Dim>
+struct Vector : array<T, Dim>
 {
-  ft x, y;
-  Vector() {}
-  Vector(ft x, ft y) : x(x), y(y) {}
-  ft dot(const Vector& r) const {
-    return x * r.x + y * r.y;
+  T dot(const Vector& r) const {
+    T s = 0;
+    for (int i = 0; i < Dim; i++) s += (*this)[i] * r[i];
+    return s;
   }
-  ft dist(const Vector& r) const {
-    return (*this - r).norm();
+  T dist(const Vector& r) const { return (*this - r).norm(); }
+  Vector unit() const { return (*this) / norm(); }
+  Vector operator*(T r) const {
+    Vector<T, Dim> res;
+    for (int i = 0; i < Dim; i++) res[i] = (*this)[i] * r;
+    return res;
   }
-  Vector unit() const {
-    ft n = 1.0 / norm();
-    return Vector(x * n, y * n);
+  Vector operator/(T r) const {
+    Vector<T, Dim> res;
+    for (int i = 0; i < Dim; i++) res[i] = (*this)[i] / r;
+    return res;
   }
-  Vector operator*(ft r) const { return Vector(x * r, y * r); }
-  Vector operator+(const Vector& r) const { return Vector(x + r.x, y + r.y); }
-  Vector operator-(const Vector& r) const { return Vector(x - r.x, y - r.y); }
+  Vector operator+(const Vector& r) const {
+    Vector<T, Dim> res;
+    for (int i = 0; i < Dim; i++) res[i] = (*this)[i] + r[i];
+    return res;
+  }
+  Vector operator-(const Vector& r) const {
+    Vector<T, Dim> res;
+    for (int i = 0; i < Dim; i++) res[i] = (*this)[i] - r[i];
+    return res;
+  }
   Vector operator+=(const Vector& r) {
-    x += r.x;
-    y += r.y;
+    for (int i = 0; i < Dim; i++) (*this)[i] += r[i];
     return *this;
   }
   Vector operator-=(const Vector& r) {
-    x -= r.x;
-    y -= r.y;
+    for (int i = 0; i < Dim; i++) (*this)[i] -= r[i];
     return *this;
   }
-  ft norm() const { return sqrt(x * x + y * y); }
-  ft norm2() const { return x * x + y * y; }
+  T norm() const { return sqrt(norm2()); }
+  T norm2() const {
+    T s(0);
+    for (int i = 0; i < Dim; i++) s += (*this)[i] * (*this)[i];
+    return s;
+  }
 };
 
-Vector operator*(ft l, const Vector& r);
+template<typename T, size_t Dim>
+Vector<T, Dim> operator*(T l, const Vector<T, Dim>& r)
+{ return r * l; }
 
+template<typename T>
 class Graph
 {
 public:
   Graph(int n) : n(n), e(n) {}
-  void addEdge(int u, int v) {
-    e[u].push_back(v);
-    e[v].push_back(u);
+  void addEdge(int u, int v, const T& w) {
+    e[u].push_back(std::make_pair(v, w));
+    e[v].push_back(std::make_pair(u, w));
   }
-  typedef std::vector<int>::const_iterator It;
+  typedef typename vector<pair<int, T> >::const_iterator It;
   int n;
-  std::vector<std::vector<int> > e;
+  vector<vector<pair<int, T>>> e;
 };
 
-class ForceDirectedAlgorithm
+template<typename T, size_t Dim>
+struct ForceDirectedDrawing
 {
-public:
-  virtual ~ForceDirectedAlgorithm() {}
-  virtual std::vector<Vector> operator()(const Graph&) = 0;
-  void setSize(ft width, ft height) { this->width = width; this->height = height; }
-protected:
-  ft width, height;
+  virtual ~ForceDirectedDrawing() {}
+  virtual std::vector<Vector<T, Dim> > operator()(const Graph<T>&) = 0;
 };
-
-ft getRand(ft);
 
 #endif /* end of include guard: CORE_HH */
