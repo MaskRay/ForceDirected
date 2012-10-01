@@ -28,6 +28,13 @@ struct Vector : array<T, Dim>
   }
   T dist(const Vector& r) const { return (*this - r).norm(); }
   Vector unit() const { return (*this) / norm(); }
+  bool operator==(const Vector& r) const {
+    for (int i = 0; i < Dim; i++) if ((*this)[i] != r[i]) return false;
+    return true;
+  }
+  bool operator!=(const Vector& r) const {
+    return ! (*this == r);
+  }
   Vector operator-() const {
     Vector<T, Dim> res;
     for (int i = 0; i < Dim; i++) res[i] = - (*this)[i];
@@ -110,5 +117,11 @@ void normalizeToSpace(vector<Vector<T, Dim>>& pos, const G& space)
       i[dim] = (i[dim] - minx) / (maxx - minx) * space[dim];
   }
 }
+
+template<typename T, size_t Dim>
+struct Cube
+{
+  array<T, Dim> lo, hi;
+};
 
 #endif /* end of include guard: CORE_HH */

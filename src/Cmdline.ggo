@@ -1,10 +1,20 @@
-option  "algorithm"            a  "algorithm"                         int     default="0"          optional
-option  "x"            x  "x coordinate of space size"                         double     default="400"          optional
-option  "y"            y  "y coordinate of space size"                         double     default="400"          optional
+option  "algorithm"  a    "algorithm"                                        int     default="0"    optional
+option  "x"          x    "x coordinate of space size"                       double  default="400"  optional
+option  "y"          y    "y coordinate of space size"                       double  default="400"  optional
+option  "kd"         -    "use k-d tree for Fruchterman-Reingold algorithm"  int     default="1"    optional
+option  "alpha"      -    "see below"                                        double  default="1.5"  optional
 
 text "\nOption `algorithm':\n"
 text "0: Frutcherman-Reingold algorithm (unweighted graph)\n"
 text "1: Kamada-Kawai algorithm (weighted graph)\n"
+text "\n"
+
+text "\nFrutcherman-Reingold algorithm:\n"
+text "--kd 1:\n"
+text "use k-d tree\n"
+text "--alpha 1.5:\n"
+text "Inspired by Barnes-Hut simulation, the resultant force of resulsive forces applied by a cluster can be approximated by the repulsive force applied by the barycenter of the cluster.\n"
+text "If d / measure > alpha, the approximation is used where `d' is the distance between the point in question and the barycenter and `measure' is the longest edge of the bounding box.\n"
 text "\n"
 
 text "\nIf unweighted graph is expected given your option of algorithms, the content of stdin should has the following form:\n"

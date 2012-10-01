@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "Core.hh"
+#include "KdTree.hh"
 
 template<typename T, size_t Dim>
 struct FruchtermanReingold : ForceDirectedDrawing<T, Dim>
@@ -12,6 +13,8 @@ struct FruchtermanReingold : ForceDirectedDrawing<T, Dim>
 
   FruchtermanReingold(const array<T, Dim>& space)
     : ForceDirectedDrawing<T, Dim>(space)
+      , use_BSP(true)
+      , alpha(1.5)
       , iterations(50) {}
   virtual void operator()(const Graph<T>& g, vector<Vector<T, Dim>>& pos) {
     vector<Vector<T, Dim>> vel(g.n);
@@ -23,12 +26,18 @@ struct FruchtermanReingold : ForceDirectedDrawing<T, Dim>
       T temperature = *std::min_element(space.begin(), space.end()) * i / iterations;
       for (int u = 0; u < g.n; u++)
         vel[u].fill(0);
-      for (int u = 0; u < g.n; u++)
-        for (int v = 0; v < g.n; v++)
-          if (u != v) {
-            Vector<T, Dim> dist = pos[v] - pos[u];
-            vel[u] -= dist.unit() * repulsive(dist.norm());
-          }
+      if (use_BSP) {
+        KdTree<T, Dim> kd(pos, alpha);
+        for (int u = 0; u < g.n; u++)
+          vel[u] += kd.getRepulsive(pos[u]) * k * k;
+      } else {
+        for (int u = 0; u < g.n; u++)
+          for (int v = 0; v < g.n; v++)
+            if (u != v) {
+              Vector<T, Dim> dist = pos[v] - pos[u];
+              vel[u] -= dist.unit() * repulsive(dist.norm());
+            }
+      }
       for (int u = 0; u < g.n; u++)
         for (typename Graph<T>::It j = g.e[u].begin(); j != g.e[u].end(); j++)
           if (j->first != u) {
@@ -46,6 +55,10 @@ struct FruchtermanReingold : ForceDirectedDrawing<T, Dim>
   }
 
   int iterations;
+
+  // if BSP
+  bool use_BSP;
+  T alpha;
 };
 
 #endif /* end of include guard: FRUCHTERMANREINGOLD_HH */

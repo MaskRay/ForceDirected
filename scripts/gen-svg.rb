@@ -9,12 +9,18 @@
 # EOF
 puts '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="440px" height="440px">'
 
-f = ->x { gets.split.map &x }
+f = ->x { STDIN.gets.split.map &x }
 n, m = f[:to_i]
 es = m.times.map { f[:to_i] }
 coords = nil
 
-IO.popen '../src/force', 'r+' do |io|
+dirs = ['.', 'src', '../src']
+dir = dirs[0]
+dirs.each do |d|
+  dir = d if File.exists? File.join d, 'force'
+end
+
+IO.popen [File.join(dir, 'force'), *ARGV], 'r+' do |io|
   io.puts "#{n} #{m}"
   es.each {|e| io.puts e.join ' ' }
   io.close_write

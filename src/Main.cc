@@ -19,6 +19,8 @@ int main(int argc, char* argv[])
       space[0] = args_info.x_arg;
       space[1] = args_info.y_arg;
       auto a = new FruchtermanReingold<double, 2>(space);
+      if (a->use_BSP = args_info.kd_arg != 0)
+        a->alpha = args_info.alpha_arg;
       algo = a;
     }
     break;

@@ -135,7 +135,7 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
       vector<Vector<T, Dim>> p_partials(g.n);
       for (int u = 0; u < g.n; u++)
         p_partials[u] = compute_partial_deriv(u, pivot);
-      // tune vertex pivot
+      // tune vertex pivot with Newton-Raphson method
       do {
         //double E = 0;
         //for (int u = 0; u < g.n; u++)
@@ -146,6 +146,7 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
           //}
         //fprintf(stderr, "E = %lf\n", E);
 
+        // Jacobi matrix
         T ddE[Dim][Dim] = {};
         for (int u = 0; u < g.n; u++)
           if (pivot != u) {
