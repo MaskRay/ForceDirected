@@ -16,16 +16,16 @@ int main(int argc, char* argv[])
   switch (args_info.algorithm_arg) {
   case 0:
     {
-      space[0] = args_info.width_arg;
-      space[1] = args_info.height_arg;
+      space[0] = args_info.x_arg;
+      space[1] = args_info.y_arg;
       auto a = new FruchtermanReingold<double, 2>(space);
       algo = a;
     }
     break;
   case 1:
     {
-      space[0] = args_info.width_arg;
-      space[1] = args_info.height_arg;
+      space[0] = args_info.x_arg;
+      space[1] = args_info.y_arg;
       auto a = new KamadaKawai<double, 2>(space);
       algo = a;
       use_w = true;

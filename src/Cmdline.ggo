@@ -1,4 +1,29 @@
 option  "algorithm"            a  "algorithm"                         int     default="0"          optional
-option  "width"            w  "width"                         double     default="400"          optional
-option  "height"            h  "height"                         double     default="400"          optional
+option  "x"            x  "x coordinate of space size"                         double     default="400"          optional
+option  "y"            y  "y coordinate of space size"                         double     default="400"          optional
 
+text "\nOption `algorithm':\n"
+text "0: Frutcherman-Reingold algorithm (unweighted graph)\n"
+text "1: Kamada-Kawai algorithm (weighted graph)\n"
+text "\n"
+
+text "\nIf unweighted graph is expected given your option of algorithms, the content of stdin should has the following form:\n"
+text "\n"
+text "  n m\n"
+text "  u_0 v_0\n"
+text "  u_1 v_1\n"
+text "  u_2 v_2\n"
+text "  ...\n"
+text "\n"
+text "The first line specifies the numbers of vertices and edges, respectively. Each following line (u_i v_i) describes an edge.\n"
+text "\n"
+
+text "\nIf weighted graph is expected given your option of algorithms, the content of stdin should has the following form:\n"
+text "\n"
+text "  n m\n"
+text "  u_0 v_0 w_0\n"
+text "  u_1 v_1 w_1\n"
+text "  u_2 v_2 w_2\n"
+text "  ...\n"
+text "\n"
+text "The first line specifies the numbers of vertices and edges, respectively. Each following line (u_i v_i w_i) describes an edge: an edge with weight w links u and v.\n"
