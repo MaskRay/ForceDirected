@@ -117,7 +117,7 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
       return res;
     };
 
-    // find max delta
+    // find the most promising vertex
     LayoutTolerance done(tolerance);
     int pivot = 0;
     T max_delta(0);
@@ -136,21 +136,13 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
       for (int u = 0; u < g.n; u++)
         p_partials[u] = compute_partial_deriv(u, pivot);
       // tune vertex pivot with Newton-Raphson method
+      double last_E = numeric_limits<T>::max();
       do {
-        //double E = 0;
-        //for (int u = 0; u < g.n; u++)
-          //for (int v = u; ++v < g.n; ) {
-            //double l = dist[u][v],
-                   //d = (pos[u] - pos[v]).norm();
-            //E += 0.5 * strength[u][v] * pow(d-l, 2);
-          //}
-        //fprintf(stderr, "E = %lf\n", E);
-
         // Jacobi matrix
         T ddE[Dim][Dim] = {};
         for (int u = 0; u < g.n; u++)
           if (pivot != u) {
-            Vector<T, Dim> diff = pos[pivot] - pos[u];
+            auto diff = pos[pivot] - pos[u];
             T d2 = diff.norm2(), d = sqrt(d2), inv_d3 = T(1) / (d2 * d),
               l = dist[pivot][u],
               k = strength[pivot][u];
@@ -162,17 +154,33 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
                   ddE[i][j] += k * l * diff[i] * diff[j] * inv_d3;
           }
 
-        Vector<T, Dim> step = LinearSolver<Dim>::solve(ddE, - partials[pivot]);
+        auto step = LinearSolver<Dim>::solve(ddE, - partials[pivot]);
         for (size_t dim = 0; dim < Dim; dim++)
           pos[pivot][dim] += step[dim];
+
+        double E = 0;
+        for (int u = 0; u < g.n; u++)
+          for (int v = u; ++v < g.n; ) {
+            double l = dist[u][v],
+                   d = (pos[u] - pos[v]).norm();
+            E += 0.5 * strength[u][v] * pow(d-l, 2);
+          }
+
+        if (E > last_E) {
+          for (size_t dim = 0; dim < Dim; dim++)
+            pos[pivot][dim] -= step[dim];
+          goto L1;
+        }
+        last_E = E;
+        fprintf(stderr, "E = %lf %d\n", E, pivot);
+
         partials[pivot] = compute_partial_derivs(pivot);
         max_delta = partials[pivot].norm();
       } while (! done(max_delta, false));
 
       int old_p = pivot;
       for (int u = 0; u < g.n; u++) {
-        Vector<T, Dim> old = p_partials[u],
-          new_ = compute_partial_deriv(u, old_p);
+        auto old = p_partials[u], new_ = compute_partial_deriv(u, old_p);
         partials[u] += new_ - old;
         T delta = partials[u].norm();
         if (delta > max_delta) {
@@ -181,6 +189,7 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
         }
       }
     }
+L1:
 
     normalizeToSpace(pos, space);
   }
@@ -199,8 +208,9 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
         }
         T diff = last - delta;
         if (diff < 0) diff = - diff;
+        T l = last;
         last = delta;
-        return delta < tolerance;
+        return delta < tolerance || delta / l < 1e-3;
       } else {
         if (last_l == numeric_limits<T>::max()) {
           last_l = delta;
@@ -208,8 +218,9 @@ struct KamadaKawai : ForceDirectedDrawing<T, Dim>
         }
         T diff = last_l - delta;
         if (diff < 0) diff = - diff;
+        T l = last_l;
         last_l = delta;
-        return delta < tolerance;
+        return delta < tolerance || delta / l < 1e-3;
       }
     }
     T tolerance, last, last_l;

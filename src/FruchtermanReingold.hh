@@ -44,11 +44,8 @@ struct FruchtermanReingold : ForceDirectedDrawing<T, Dim>
             Vector<T, Dim> dist = pos[j->first] - pos[u];
             vel[u] += dist.unit() * attractive(dist.norm());
           }
-      for (int u = 0; u < g.n; u++) {
+      for (int u = 0; u < g.n; u++)
         pos[u] += vel[u].unit() * min(vel[u].norm(), temperature);
-        for (size_t dim = 0; dim < Dim; dim++)
-          pos[u][dim] = min(space[dim], max(T(0), pos[u][dim]));
-      }
     }
 
     normalizeToSpace(pos, space);
