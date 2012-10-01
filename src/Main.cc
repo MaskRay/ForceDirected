@@ -1,6 +1,7 @@
 #include "Core.hh"
 #include "Circle.hh"
 #include "FruchtermanReingold.hh"
+#include "Walshaw.hh"
 #include "KamadaKawai.hh"
 #include "Cmdline.h"
 
@@ -20,12 +21,27 @@ int main(int argc, char* argv[])
       space[1] = args_info.y_arg;
       auto a = new FruchtermanReingold<double, 2>(space);
       a->iterations = args_info.iterations_arg;
+      a->separation_constant = args_info.separation_arg;
+      a->force_constant = args_info.repulsive_arg;
       if (a->use_BSP = args_info.kd_arg != 0)
         a->alpha = args_info.alpha_arg;
       algo = a;
     }
     break;
   case 1:
+    {
+      space[0] = args_info.x_arg;
+      space[1] = args_info.y_arg;
+      auto a = new Walshaw<double, 2>(space);
+      a->iterations = args_info.iterations_arg;
+      a->separation_constant = args_info.separation_arg;
+      a->force_constant = args_info.repulsive_arg;
+      if (a->use_BSP = args_info.kd_arg != 0)
+        a->alpha = args_info.alpha_arg;
+      algo = a;
+    }
+    break;
+  case 2:
     {
       space[0] = args_info.x_arg;
       space[1] = args_info.y_arg;

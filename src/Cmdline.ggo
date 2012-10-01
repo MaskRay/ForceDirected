@@ -1,9 +1,11 @@
-option  "algorithm"  a    "algorithm"                                        int     default="0"    optional
-option  "x"          x    "x coordinate of space size"                       double  default="400"  optional
-option  "y"          y    "y coordinate of space size"                       double  default="400"  optional
-option  "iterations" i    "see below"                                        int     default="50"   optional
-option  "kd"         -    "use k-d tree for Fruchterman-Reingold algorithm"  int     default="1"    optional
-option  "alpha"      -    "see below"                                        double  default="1.5"  optional
+option  "algorithm"   a  "algorithm"                   int     default="0"    optional
+option  "separation"  s  "separation constant"         double  default="2"    optional
+option  "repulsive"   r  "repulsive constant"          double  default="0.1"  optional
+option  "x"           x  "x coordinate of space size"  double  default="400"  optional
+option  "y"           y  "y coordinate of space size"  double  default="400"  optional
+option  "iterations"  i  "see below"                   int     default="50"   optional
+option  "kd"          -  "see below"                   int     default="1"    optional
+option  "alpha"       -  "see below"                   double  default="1.5"  optional
 
 text "\nOption `algorithm':\n"
 text "0: Frutcherman-Reingold algorithm (unweighted graph)\n"
@@ -14,11 +16,21 @@ text "Frutcherman-Reingold algorithm\n"
 text "------------------------------\n\n"
 text "--iterations 50\n"
 text "50 iterations\n\n"
+text "--separation 2\n"
+text "ideal length of an edge = separation * (x * y * z * ... / n) ^ (1 / dim)\n\n"
 text "--kd 1\n"
 text "use k-d tree\n\n"
 text "--alpha 1.5\n"
 text "Inspired by Barnes-Hut simulation, the resultant force of resulsive forces applied by a cluster can be approximated by the repulsive force applied by the barycenter of the cluster.\n"
 text "If d / measure > alpha, the approximation is used where `d' is the distance between the point in question and the barycenter and `measure' is the longest edge of the bounding box.\n"
+text "\n"
+
+text "Walshaw algorithm\n"
+text "------------------------------\n\n"
+text "--iterations 50\n"
+text "--separation 2\n"
+text "--kd 1\n"
+text "--alpha 1.5\n"
 text "\n"
 
 text "Input format\n"
