@@ -1,11 +1,19 @@
 #ifndef CORE_HH
 #define CORE_HH
 
+#include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
+#include <functional>
 #include <utility>
 #include <vector>
 using std::array;
+using std::bind;
+using std::function;
+using std::max;
+using std::min;
+using std::numeric_limits;
 using std::pair;
 using std::sqrt;
 using std::vector;
@@ -20,6 +28,11 @@ struct Vector : array<T, Dim>
   }
   T dist(const Vector& r) const { return (*this - r).norm(); }
   Vector unit() const { return (*this) / norm(); }
+  Vector operator-() const {
+    Vector<T, Dim> res;
+    for (int i = 0; i < Dim; i++) res[i] = - (*this)[i];
+    return res;
+  }
   Vector operator*(T r) const {
     Vector<T, Dim> res;
     for (int i = 0; i < Dim; i++) res[i] = (*this)[i] * r;
@@ -77,8 +90,25 @@ public:
 template<typename T, size_t Dim>
 struct ForceDirectedDrawing
 {
+  ForceDirectedDrawing(const array<T, Dim>& space) : space(space) {}
   virtual ~ForceDirectedDrawing() {}
-  virtual std::vector<Vector<T, Dim> > operator()(const Graph<T>&) = 0;
+  virtual void operator()(const Graph<T>&, vector<Vector<T, Dim>>&) = 0;
+  array<T, Dim> space;
 };
+
+template<typename T, size_t Dim, typename G>
+void normalizeToSpace(vector<Vector<T, Dim>>& pos, const G& space)
+{
+  for (size_t dim = 0; dim < Dim; dim++) {
+    T minx = numeric_limits<T>::max(),
+      maxx = numeric_limits<T>::min();
+    for (auto &i : pos) {
+      minx = min(minx, i[dim]);
+      maxx = max(maxx, i[dim]);
+    }
+    for (auto &i : pos)
+      i[dim] = (i[dim] - minx) / (maxx - minx) * space[dim];
+  }
+}
 
 #endif /* end of include guard: CORE_HH */
